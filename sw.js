@@ -1,11 +1,13 @@
 const CACHE_NAME = 'pulswyr-cache-v1';
 const API_CACHE_NAME = 'pulswyr-api-cache-v1';
 const urlsToCache = [
-  '/',
-  // Add paths to your icons here if you want them cached
-  '/icons/icon-192x192.png',
-  '/icons/icon-512x512.png',
-  '/icons/icon-180x180.png'
+  './', // This caches the index.html file at the root
+  './index.html',
+  './manifest.json',
+  './images/tiki-background.png', // Make sure this path is correct
+  './icons/icon-192x192.png',
+  './icons/icon-512x512.png',
+  './icons/icon-180x180.png'
 ];
 
 // Install event: Cache core application shell files
