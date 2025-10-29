@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Updated Title -->
+    <title>PulsWyr</title>
+    <style>
+        /* --- Synthwave Theme --- */
+        :root {
+            --background-dark: #0d0221; /* Dark Purple/Blue */
+            --card-dark: #1a0a38;      /* Slightly lighter dark */
+            --text-light: #e0e0e0;     /* Light gray text */
+            --text-muted: #8c82a1;     /* Muted purple/gray for dates */
+            --border-color: #2a1a4a;   /* Dark border */
+            --neon-cyan: #00f0ff;
+            --neon-magenta: #ff00ff;
+            --neon-lime: #a8ff00;
+            --shadow-color: rgba(255, 0, 255, 0.2); /* Neon magenta shadow */
+        }
+
+        /* --- Basic Setup --- */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--background-dark);
+            color: var(--text-light);
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            /* Updated Heading */
+            color: var(--neon-cyan);
+            margin-bottom: 30px;
+            font-weight: 600;
+            text-shadow: 0 0 5px var(--neon-cyan), 0 0 10px var(--neon-cyan);
+        }
+
+        /* --- Grid Layout --- */
+        #feed-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 24px;
+        }
+
+        /* --- Card Styling --- */
+        .feed-card {
+            background-color: var(--card-dark);
+            border-radius: 12px;
+            box-shadow: 0 8px 25px var(--shadow-color);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid var(--border-color); /* Add subtle border */
+        }
+
+        .card-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            background-color: rgba(0, 0, 0, 0.1); /* Slightly darker header */
+        }
+
+        .card-header a {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-light); /* Header text light */
+        }
+
+        .card-header a:hover {
+            color: var(--neon-magenta); /* Neon hover for header */
+            text-shadow: 0 0 3px var(--neon-magenta);
+        }
+
+        .favicon {
+            width: 16px;
+            height: 16px;
+            margin-right: 10px;
+            vertical-align: middle;
+            filter: brightness(0.9); /* Slightly dim favicon if needed */
+        }
+
+        .card-content {
+            padding: 20px;
+            flex-grow: 1;
+        }
+
+        /* --- Loader Styling --- */
+        .loader {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 150px;
+        }
+
+        .spinner {
+            border: 4px solid rgba(140, 130, 161, 0.3); /* Muted border */
+            border-top: 4px solid var(--neon-cyan); /* Neon spinner color */
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* --- Feed Item Styling --- */
+        .feed-item {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .feed-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .item-title {
+            display: block;
+            text-decoration: none;
+            color: var(--neon-cyan); /* Neon link color */
+            font-weight: 500;
+            line-height: 1.4;
+            margin-bottom: 5px;
+            transition: color 0.2s ease, text-shadow 0.2s ease;
+        }
+
+        .item-title:hover {
+            text-decoration: none;
+            color: var(--neon-lime); /* Different neon on hover */
+            text-shadow: 0 0 5px var(--neon-lime);
+        }
+
+        .item-date {
+            font-size: 0.8rem;
+            color: var(--text-muted); /* Muted color for dates */
+        }
+
+        .error {
+            color: #ff4d4d; /* Bright red for errors on dark bg */
+            font-weight: 500;
+            text-shadow: 0 0 3px #ff4d4d;
+        }
+    </style>
+</head>
+<body>
+    <!-- Updated H1 -->
+    <h1>PulsWyr</h1>
+
+    <main id="feed-grid"></main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const apiKey = "nr4ujng9nkcr4lhgx5v59r8inrkhl5ig43nbbytm";
+
+            const sources = [
+                { name: "The Verge", url: "https://www.theverge.com/rss/index.xml" },
+                { name: "TechRadar", url: "https://www.techradar.com/rss" },
+                { name: "MacRumors", url: "https://macrumors.com/macrumors.xml" },
+                { name: "9to5Google", url: "https://9to5google.com/feed/" },
+                { name: "9to5Mac", url: "https://9to5mac.com/feed/" },
+                { name: "Android Authority", url: "https://www.androidauthority.com/feed/" },
+                { name: "Android Central", url: "https://www.androidcentral.com/feed" },
+                { name: "Ars Technica", url: "https://arstechnica.com/feed/" },
+                { name: "Engadget", url: "https://www.engadget.com/rss.xml" },
+                { name: "Gear Patrol", url: "https://gearpatrol.com/feed/" },
+                { name: "Den of Geek", url: "https://www.denofgeek.com/feed/" },
+                { name: "Hacker News", url: "https://news.ycombinator.com/rss" },
+                { name: "Hacker Noon", url: "https://hackernoon.com/feed" },
+                { name: "Stereogum", url: "https://www.stereogum.com/feed/" },
+                { name: "Pitchfork", url: "https://pitchfork.com/rss/news/" },
+                { name: "Consequence", url: "https://consequence.net/feed/" },
+                { name: "BrooklynVegan", url: "https://www.brooklynvegan.com/feed/" },
+                { name: "The Quietus", url: "https://thequietus.com/rss" },
+                { name: "Fast Company", url: "https://www.fastcompany.com/rss" },
+                { name: "Vox", url: "https://www.vox.com/rss/index.xml" },
+                { name: "Kotaku", url: "https://kotaku.com/feed" }
+            ];
+
+            const grid = document.getElementById('feed-grid');
+
+            async function loadAllFeeds() {
+                for (const source of sources) {
+                    const card = createCardShell(source);
+                    grid.appendChild(card);
+                    await fetchFeed(source, card);
+                    await new Promise(resolve => setTimeout(resolve, 10));
+                }
+            }
+
+            loadAllFeeds();
+
+            function createCardShell(source) {
+                const card = document.createElement('article');
+                card.className = 'feed-card';
+
+                card.innerHTML = `
+                    <div class="card-header">
+                        <a href="#" target="_blank" rel="noopener">
+                            <img src="" alt="" class="favicon" style="display:none;">
+                            ${source.name}
+                        </a>
+                    </div>
+                    <div class="card-content">
+                        <div class="loader">
+                            <div class="spinner"></div>
+                        </div>
+                    </div>
+                `;
+                return card;
+            }
+
+            async function fetchFeed(source, card) {
+                const rssUrl = encodeURIComponent(source.url);
+                const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${rssUrl}&api_key=${apiKey}&count=5`;
+
+                const contentEl = card.querySelector('.card-content');
+                const headerLink = card.querySelector('.card-header a');
+                const favicon = card.querySelector('.favicon');
+
+                let domain = source.url;
+                 try {
+                    domain = new URL(source.url).hostname;
+                 } catch (e) {
+                      console.warn(`Could not parse domain for ${source.name} from URL: ${source.url}`);
+                       try {
+                            domain = source.url.split('/')[2];
+                       } catch (fallbackError) {
+                            console.error("Manual domain extraction failed too:", fallbackError);
+                            domain = null;
+                       }
+                 }
+
+                try {
+                    const response = await fetch(apiUrl);
+                    if (response.status === 401) {
+                         throw new Error(`Unauthorized - Check API Key.`);
+                    }
+                    if (response.status === 422) {
+                         throw new Error(`Unprocessable Feed URL: ${source.url}. API may not support this format.`);
+                    }
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status} ${response.statusText}`);
+                    }
+                    const data = await response.json();
+
+                    if (data.status !== 'ok') {
+                         if (data.message && data.message.includes("Feed not found")) {
+                             throw new Error(`Feed URL is invalid or unparseable.`);
+                         }
+                          if (data.message && data.message.includes("Invalid API key")) {
+                             throw new Error(`Invalid API Key provided.`);
+                         }
+                         if (response.status === 429) {
+                             throw new Error(`Rate limited by API.`);
+                         }
+                        throw new Error(`API status not 'ok': ${data.message || 'Unknown API error'}`);
+                    }
+
+                    const siteLink = data.feed.link;
+                    headerLink.href = siteLink;
+
+                    if (domain) {
+                        favicon.src = `https://t0.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://${domain}&size=16`;
+                        favicon.style.display = 'inline-block';
+                        favicon.onerror = () => { favicon.style.display = 'none'; };
+                    } else {
+                         favicon.style.display = 'none';
+                    }
+
+                    contentEl.innerHTML = '';
+                    const items = data.items;
+
+                    if (!items || items.length === 0) {
+                        contentEl.innerHTML = '<span class="error">No feed items found.</span>';
+                        return;
+                    }
+
+                    items.forEach(item => {
+                        const itemEl = document.createElement('div');
+                        itemEl.className = 'feed-item';
+
+                        let displayDate = 'Date unavailable';
+                        try {
+                           const pubDate = new Date(item.pubDate);
+                           if (!isNaN(pubDate)) {
+                               displayDate = pubDate.toLocaleString('en-US', {
+                                   month: 'short',
+                                   day: 'numeric',
+                                   hour: 'numeric',
+                                   minute: '2-digit'
+                               });
+                           }
+                        } catch (dateError) {
+                            console.warn("Could not parse date:", item.pubDate, dateError);
+                        }
+
+                        itemEl.innerHTML = `
+                            <a href="${item.link}" target="_blank" rel="noopener" class="item-title">${item.title || 'Untitled'}</a>
+                            <span class="item-date">${displayDate}</span>
+                        `;
+                        contentEl.appendChild(itemEl);
+                    });
+
+                } catch (error) {
+                    console.error('Error fetching feed:', source.name, `URL: ${source.url}`, error);
+                    contentEl.innerHTML = `<span class="error">Could not load feed. (${error.message})</span>`;
+                    if(domain) {
+                        favicon.src = `https://t0.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://${domain}&size=16`;
+                        favicon.style.display = 'inline-block';
+                        favicon.onerror = () => { favicon.style.display = 'none'; };
+                        headerLink.href = 'http://' + domain;
+                    } else {
+                        favicon.style.display = 'none';
+                        headerLink.href = '#';
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
