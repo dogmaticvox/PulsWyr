@@ -1,8 +1,7 @@
 const CACHE_NAME = 'pulswyr-cache-v1';
 const API_CACHE_NAME = 'pulswyr-api-cache-v1';
 const urlsToCache = [
-  '/', // Cache the root URL if it redirects to dashboard.html or serves it directly
-  '/dashboard.html',
+  '/',
   // Add paths to your icons here if you want them cached
   '/icons/icon-192x192.png',
   '/icons/icon-512x512.png',
