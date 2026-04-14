@@ -12,21 +12,21 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="PulsWyr">
-    <!-- Link to Apple Touch Icon (assuming 180x180 in /icons/) -->
+    <!-- Link to Apple Touch Icon -->
     <link rel="apple-touch-icon" href="/icons/icon-180x180.png">
 
     <style>
         /* --- Synthwave Theme --- */
         :root {
-            --background-dark: #0d0221; /* Dark Purple/Blue */
-            --card-dark: #1a0a38;      /* Slightly lighter dark */
-            --text-light: #e0e0e0;     /* Light gray text */
-            --text-muted: #8c82a1;     /* Muted purple/gray for dates */
-            --border-color: #2a1a4a;   /* Dark border */
+            --background-dark: #0d0221;
+            --card-dark: #1a0a38;
+            --text-light: #e0e0e0;
+            --text-muted: #8c82a1;
+            --border-color: #2a1a4a;
             --neon-cyan: #00f0ff;
             --neon-magenta: #ff00ff;
             --neon-lime: #a8ff00;
-            --shadow-color: rgba(255, 0, 255, 0.2); /* Neon magenta shadow */
+            --shadow-color: rgba(255, 0, 255, 0.2);
         }
 
         /* --- Basic Setup --- */
@@ -40,11 +40,131 @@
 
         h1 {
             text-align: center;
-            /* Updated Heading */
             color: var(--neon-cyan);
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             font-weight: 600;
             text-shadow: 0 0 5px var(--neon-cyan), 0 0 10px var(--neon-cyan);
+        }
+
+        /* --- System Banners --- */
+        .system-banner {
+            display: none;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px 16px;
+            font-size: 0.9rem;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+        .system-banner.visible {
+            display: flex;
+        }
+
+        /* Offline banner */
+        #offline-banner {
+            background: rgba(255, 77, 77, 0.12);
+            border: 1px solid #ff4d4d;
+            color: #ff4d4d;
+        }
+
+        /* SW update banner */
+        #update-banner {
+            background: rgba(0, 240, 255, 0.08);
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+        }
+        #update-banner button {
+            background: transparent;
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            border-radius: 4px;
+            padding: 4px 12px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
+        #update-banner button:hover {
+            background: rgba(0, 240, 255, 0.15);
+        }
+
+        /* Install banner */
+        #install-banner {
+            background: rgba(168, 255, 0, 0.08);
+            border: 1px solid var(--neon-lime);
+            color: var(--text-light);
+        }
+        .install-banner-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        #install-btn {
+            background: transparent;
+            border: 1px solid var(--neon-lime);
+            color: var(--neon-lime);
+            border-radius: 4px;
+            padding: 4px 12px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            white-space: nowrap;
+        }
+        #install-btn:hover {
+            background: rgba(168, 255, 0, 0.15);
+        }
+        #install-dismiss, #ios-install-dismiss {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 0 4px;
+            line-height: 1;
+        }
+        #install-dismiss:hover, #ios-install-dismiss:hover {
+            color: var(--text-light);
+        }
+
+        /* iOS install hint banner */
+        #ios-install-banner {
+            background: rgba(168, 255, 0, 0.08);
+            border: 1px solid var(--neon-lime);
+            color: var(--text-light);
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        #ios-install-banner span {
+            flex: 1;
+        }
+
+        /* --- Category Tabs --- */
+        #category-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            border-radius: 20px;
+            padding: 6px 20px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .tab-btn:hover {
+            border-color: var(--text-muted);
+            color: var(--text-light);
+        }
+        .tab-btn[aria-selected="true"] {
+            border-color: var(--neon-cyan);
+            color: var(--neon-cyan);
+            box-shadow: 0 0 8px rgba(0, 240, 255, 0.35);
         }
 
         /* --- Grid Layout --- */
@@ -62,13 +182,13 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            border: 1px solid var(--border-color); /* Add subtle border */
+            border: 1px solid var(--border-color);
         }
 
         .card-header {
             padding: 16px 20px;
             border-bottom: 1px solid var(--border-color);
-            background-color: rgba(0, 0, 0, 0.1); /* Slightly darker header */
+            background-color: rgba(0, 0, 0, 0.1);
         }
 
         .card-header a {
@@ -77,11 +197,11 @@
             text-decoration: none;
             font-size: 1.1rem;
             font-weight: 600;
-            color: var(--text-light); /* Header text light */
+            color: var(--text-light);
         }
 
         .card-header a:hover {
-            color: var(--neon-magenta); /* Neon hover for header */
+            color: var(--neon-magenta);
             text-shadow: 0 0 3px var(--neon-magenta);
         }
 
@@ -90,7 +210,7 @@
             height: 16px;
             margin-right: 10px;
             vertical-align: middle;
-            filter: brightness(0.9); /* Slightly dim favicon if needed */
+            filter: brightness(0.9);
         }
 
         .card-content {
@@ -107,8 +227,8 @@
         }
 
         .spinner {
-            border: 4px solid rgba(140, 130, 161, 0.3); /* Muted border */
-            border-top: 4px solid var(--neon-cyan); /* Neon spinner color */
+            border: 4px solid rgba(140, 130, 161, 0.3);
+            border-top: 4px solid var(--neon-cyan);
             border-radius: 50%;
             width: 30px;
             height: 30px;
@@ -136,7 +256,7 @@
         .item-title {
             display: block;
             text-decoration: none;
-            color: var(--neon-cyan); /* Neon link color */
+            color: var(--neon-cyan);
             font-weight: 500;
             line-height: 1.4;
             margin-bottom: 5px;
@@ -145,17 +265,54 @@
 
         .item-title:hover {
             text-decoration: none;
-            color: var(--neon-lime); /* Different neon on hover */
+            color: var(--neon-lime);
             text-shadow: 0 0 5px var(--neon-lime);
+        }
+
+        .item-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
         }
 
         .item-date {
             font-size: 0.8rem;
-            color: var(--text-muted); /* Muted color for dates */
+            color: var(--text-muted);
+        }
+
+        .cached-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        /* --- Share Button --- */
+        .share-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 0.8rem;
+            padding: 2px 4px;
+            border-radius: 3px;
+            transition: color 0.2s ease;
+            flex-shrink: 0;
+            line-height: 1;
+        }
+        .share-btn:hover {
+            color: var(--neon-magenta);
+        }
+
+        /* Share copied tooltip */
+        .share-btn.copied::after {
+            content: ' Copied!';
+            color: var(--neon-lime);
+            font-size: 0.75rem;
         }
 
         .error {
-            color: #ff4d4d; /* Bright red for errors on dark bg */
+            color: #ff4d4d;
             font-weight: 500;
             text-shadow: 0 0 3px #ff4d4d;
         }
@@ -164,59 +321,301 @@
 <body>
     <h1>PulsWyr</h1>
 
+    <!-- Offline indicator -->
+    <div id="offline-banner" class="system-banner" role="status" aria-live="polite">
+        <span>You are offline &mdash; showing cached content where available.</span>
+    </div>
+
+    <!-- SW update notification -->
+    <div id="update-banner" class="system-banner" role="status">
+        <span>A new version of PulsWyr is available.</span>
+        <button id="update-btn">Refresh to update</button>
+    </div>
+
+    <!-- Install prompt (Chrome/Android) -->
+    <div id="install-banner" class="system-banner" role="banner">
+        <span>Install PulsWyr for fast, offline access.</span>
+        <div class="install-banner-actions">
+            <button id="install-btn">Install</button>
+            <button id="install-dismiss" aria-label="Dismiss">&#x2715;</button>
+        </div>
+    </div>
+
+    <!-- iOS install hint -->
+    <div id="ios-install-banner" class="system-banner" role="banner">
+        <span>To install: tap the <strong>Share</strong> button in Safari, then <strong>Add to Home Screen</strong>.</span>
+        <button id="ios-install-dismiss" aria-label="Dismiss">&#x2715;</button>
+    </div>
+
+    <!-- Category tabs -->
+    <nav id="category-tabs" role="tablist" aria-label="Feed categories">
+        <button class="tab-btn" role="tab" data-category="all"     aria-selected="true">All</button>
+        <button class="tab-btn" role="tab" data-category="tech"    aria-selected="false">Tech</button>
+        <button class="tab-btn" role="tab" data-category="music"   aria-selected="false">Music</button>
+        <button class="tab-btn" role="tab" data-category="culture" aria-selected="false">Culture</button>
+    </nav>
+
     <main id="feed-grid"></main>
 
     <script>
-        // Register Service Worker
+        // ─── Service Worker Registration ──────────────────────────────────────────
         if ('serviceWorker' in navigator) {
-          window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/sw.js')
-              .then(registration => {
-                console.log('ServiceWorker registration successful with scope: ', registration.scope);
-              })
-              .catch(error => {
-                console.log('ServiceWorker registration failed: ', error);
-              });
-          });
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => {
+                        console.log('SW registered, scope:', registration.scope);
+
+                        // Detect when a new SW is found and waiting
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    showUpdateBanner(registration);
+                                }
+                            });
+                        });
+
+                        // Register for periodic background sync if supported
+                        registerPeriodicSync(registration);
+                    })
+                    .catch(err => console.log('SW registration failed:', err));
+
+                // Receive messages from the SW (e.g. SW_ACTIVATED after update)
+                navigator.serviceWorker.addEventListener('message', e => {
+                    if (e.data && e.data.type === 'SW_ACTIVATED') {
+                        // Only show if there was a previous controller (not first install)
+                        if (navigator.serviceWorker.controller) {
+                            showUpdateBanner(null);
+                        }
+                    }
+                });
+
+                // Reload page once the new SW has taken control
+                let refreshing = false;
+                navigator.serviceWorker.addEventListener('controllerchange', () => {
+                    if (!refreshing) {
+                        refreshing = true;
+                        window.location.reload();
+                    }
+                });
+            });
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
+        async function registerPeriodicSync(registration) {
+            if (!('periodicSync' in registration)) return;
+            try {
+                const status = await navigator.permissions.query({ name: 'periodic-background-sync' });
+                if (status.state === 'granted') {
+                    await registration.periodicSync.register('feed-refresh', {
+                        minInterval: 60 * 60 * 1000 // 1 hour
+                    });
+                    console.log('Periodic background sync registered');
+                }
+            } catch (e) {
+                console.log('Periodic sync not available:', e);
+            }
+        }
 
+        // ─── SW Update Banner ─────────────────────────────────────────────────────
+        function showUpdateBanner(registration) {
+            const banner = document.getElementById('update-banner');
+            const btn = document.getElementById('update-btn');
+            banner.classList.add('visible');
+            btn.addEventListener('click', () => {
+                if (registration && registration.waiting) {
+                    registration.waiting.postMessage('SKIP_WAITING');
+                } else {
+                    window.location.reload();
+                }
+            }, { once: true });
+        }
+
+        // ─── Offline Banner ───────────────────────────────────────────────────────
+        function updateOfflineStatus() {
+            const banner = document.getElementById('offline-banner');
+            if (!navigator.onLine) {
+                banner.classList.add('visible');
+            } else {
+                banner.classList.remove('visible');
+            }
+        }
+        window.addEventListener('online', updateOfflineStatus);
+        window.addEventListener('offline', updateOfflineStatus);
+        updateOfflineStatus();
+
+        // ─── Install Prompt ───────────────────────────────────────────────────────
+        let deferredInstallPrompt = null;
+        const isInStandaloneMode = () =>
+            window.matchMedia('(display-mode: standalone)').matches ||
+            window.navigator.standalone === true;
+
+        window.addEventListener('beforeinstallprompt', e => {
+            e.preventDefault();
+            deferredInstallPrompt = e;
+            if (!isInStandaloneMode()) {
+                document.getElementById('install-banner').classList.add('visible');
+            }
+        });
+
+        window.addEventListener('appinstalled', () => {
+            document.getElementById('install-banner').classList.remove('visible');
+            deferredInstallPrompt = null;
+        });
+
+        document.getElementById('install-btn').addEventListener('click', async () => {
+            if (!deferredInstallPrompt) return;
+            deferredInstallPrompt.prompt();
+            await deferredInstallPrompt.userChoice;
+            document.getElementById('install-banner').classList.remove('visible');
+            deferredInstallPrompt = null;
+        });
+
+        document.getElementById('install-dismiss').addEventListener('click', () => {
+            document.getElementById('install-banner').classList.remove('visible');
+        });
+
+        // iOS Safari: show manual install hint if not already installed
+        const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+        if (isIOS && !isInStandaloneMode()) {
+            document.getElementById('ios-install-banner').classList.add('visible');
+        }
+        document.getElementById('ios-install-dismiss').addEventListener('click', () => {
+            document.getElementById('ios-install-banner').classList.remove('visible');
+        });
+
+        // ─── IndexedDB Helpers ────────────────────────────────────────────────────
+        const DB_NAME = 'pulswyr-db';
+        const DB_VERSION = 1;
+
+        function openDB() {
+            return new Promise((resolve, reject) => {
+                const req = indexedDB.open(DB_NAME, DB_VERSION);
+                req.onupgradeneeded = e => {
+                    const db = e.target.result;
+                    if (!db.objectStoreNames.contains('articles')) {
+                        db.createObjectStore('articles', { keyPath: 'sourceName' });
+                    }
+                };
+                req.onsuccess = e => resolve(e.target.result);
+                req.onerror = e => reject(e.target.error);
+            });
+        }
+
+        async function idbGet(sourceName) {
+            try {
+                const db = await openDB();
+                return new Promise((resolve, reject) => {
+                    const tx = db.transaction('articles', 'readonly');
+                    const req = tx.objectStore('articles').get(sourceName);
+                    req.onsuccess = e => resolve(e.target.result);
+                    req.onerror = e => reject(e.target.error);
+                });
+            } catch (e) {
+                return undefined;
+            }
+        }
+
+        async function idbPut(sourceName, items, feedMeta) {
+            try {
+                const db = await openDB();
+                return new Promise((resolve, reject) => {
+                    const tx = db.transaction('articles', 'readwrite');
+                    tx.objectStore('articles').put({ sourceName, items, feedMeta, fetchedAt: Date.now() });
+                    tx.oncomplete = resolve;
+                    tx.onerror = e => reject(e.target.error);
+                });
+            } catch (e) {
+                // IDB errors are non-fatal
+            }
+        }
+
+        // ─── HTML Escape Helper ───────────────────────────────────────────────────
+        function escapeHtml(str) {
+            return String(str || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#x27;');
+        }
+
+        // ─── Main App Logic ───────────────────────────────────────────────────────
+        document.addEventListener('DOMContentLoaded', () => {
             const apiKey = "nr4ujng9nkcr4lhgx5v59r8inrkhl5ig43nbbytm";
 
             const sources = [
-                { name: "The Verge", url: "https://www.theverge.com/rss/index.xml" },
-                { name: "TechRadar", url: "https://www.techradar.com/rss" },
-                { name: "MacRumors", url: "https://macrumors.com/macrumors.xml" },
-                { name: "9to5Google", url: "https://9to5google.com/feed/" },
-                { name: "9to5Mac", url: "https://9to5mac.com/feed/" },
-                { name: "Android Authority", url: "https://www.androidauthority.com/feed/" },
-                { name: "Android Central", url: "https://www.androidcentral.com/feed" },
-                { name: "Ars Technica", url: "https://arstechnica.com/feed/" },
-                { name: "Engadget", url: "https://www.engadget.com/rss.xml" },
-                { name: "Gear Patrol", url: "https://gearpatrol.com/feed/" },
-                { name: "Den of Geek", url: "https://www.denofgeek.com/feed/" },
-                { name: "Hacker News", url: "https://news.ycombinator.com/rss" },
-                { name: "Hacker Noon", url: "https://hackernoon.com/feed" },
-                { name: "Stereogum", url: "https://www.stereogum.com/feed/" },
-                { name: "Pitchfork", url: "https://pitchfork.com/rss/news/" },
-                { name: "Consequence", url: "https://consequence.net/feed/" },
-                { name: "BrooklynVegan", url: "https://www.brooklynvegan.com/feed/" },
-                { name: "The Quietus", url: "https://thequietus.com/rss" },
-                { name: "Fast Company", url: "https://www.fastcompany.com/rss" },
-                { name: "Vox", url: "https://www.vox.com/rss/index.xml" },
-                { name: "Kotaku", url: "https://kotaku.com/feed" }
+                { name: "The Verge",          url: "https://www.theverge.com/rss/index.xml",      category: "tech" },
+                { name: "TechRadar",           url: "https://www.techradar.com/rss",               category: "tech" },
+                { name: "MacRumors",           url: "https://macrumors.com/macrumors.xml",         category: "tech" },
+                { name: "9to5Google",          url: "https://9to5google.com/feed/",                category: "tech" },
+                { name: "9to5Mac",             url: "https://9to5mac.com/feed/",                   category: "tech" },
+                { name: "Android Authority",   url: "https://www.androidauthority.com/feed/",      category: "tech" },
+                { name: "Android Central",     url: "https://www.androidcentral.com/feed",         category: "tech" },
+                { name: "Ars Technica",        url: "https://arstechnica.com/feed/",               category: "tech" },
+                { name: "Engadget",            url: "https://www.engadget.com/rss.xml",            category: "tech" },
+                { name: "Gear Patrol",         url: "https://gearpatrol.com/feed/",                category: "tech" },
+                { name: "Hacker News",         url: "https://news.ycombinator.com/rss",            category: "tech" },
+                { name: "Hacker Noon",         url: "https://hackernoon.com/feed",                 category: "tech" },
+                { name: "Stereogum",           url: "https://www.stereogum.com/feed/",             category: "music" },
+                { name: "Pitchfork",           url: "https://pitchfork.com/rss/news/",             category: "music" },
+                { name: "Consequence",         url: "https://consequence.net/feed/",               category: "music" },
+                { name: "BrooklynVegan",       url: "https://www.brooklynvegan.com/feed/",         category: "music" },
+                { name: "The Quietus",         url: "https://thequietus.com/rss",                  category: "music" },
+                { name: "Den of Geek",         url: "https://www.denofgeek.com/feed/",             category: "culture" },
+                { name: "Fast Company",        url: "https://www.fastcompany.com/rss",             category: "culture" },
+                { name: "Vox",                 url: "https://www.vox.com/rss/index.xml",           category: "culture" },
+                { name: "Kotaku",              url: "https://kotaku.com/feed",                     category: "culture" }
             ];
 
             const grid = document.getElementById('feed-grid');
+            const shareSupported = 'share' in navigator;
 
+            // ── Category Tabs ──────────────────────────────────────────────────────
+            function getActiveCategory() {
+                const hash = window.location.hash.slice(1);
+                return ['tech', 'music', 'culture'].includes(hash) ? hash : 'all';
+            }
+
+            function applyCategory(category) {
+                document.querySelectorAll('.feed-card').forEach(card => {
+                    const show = category === 'all' || card.dataset.category === category;
+                    card.style.display = show ? '' : 'none';
+                });
+                document.querySelectorAll('.tab-btn').forEach(btn => {
+                    btn.setAttribute('aria-selected', btn.dataset.category === category ? 'true' : 'false');
+                });
+            }
+
+            document.getElementById('category-tabs').addEventListener('click', e => {
+                const btn = e.target.closest('.tab-btn');
+                if (!btn) return;
+                const category = btn.dataset.category;
+                window.location.hash = category === 'all' ? '' : category;
+                applyCategory(category);
+            });
+
+            window.addEventListener('hashchange', () => applyCategory(getActiveCategory()));
+
+            // ── Feed Loading ───────────────────────────────────────────────────────
             async function loadAllFeeds() {
+                const activeCategory = getActiveCategory();
                 for (const source of sources) {
                     const card = createCardShell(source);
                     grid.appendChild(card);
-                    await fetchFeed(source, card);
+                    if (activeCategory !== 'all' && source.category !== activeCategory) {
+                        card.style.display = 'none';
+                    }
+                    // Pre-load from IndexedDB immediately (shows cached content)
+                    const cached = await idbGet(source.name);
+                    if (cached) {
+                        renderItems(card, cached.items, cached.feedMeta, true);
+                    }
+                    // Then fetch from network (updates card and IDB when done)
+                    fetchFeed(source, card);
                     await new Promise(resolve => setTimeout(resolve, 10));
                 }
+                // Apply initial category filter after cards are built
+                applyCategory(activeCategory);
             }
 
             loadAllFeeds();
@@ -224,12 +623,13 @@
             function createCardShell(source) {
                 const card = document.createElement('article');
                 card.className = 'feed-card';
+                card.dataset.category = source.category;
 
                 card.innerHTML = `
                     <div class="card-header">
                         <a href="#" target="_blank" rel="noopener">
                             <img src="" alt="" class="favicon" style="display:none;">
-                            ${source.name}
+                            ${escapeHtml(source.name)}
                         </a>
                     </div>
                     <div class="card-content">
@@ -241,6 +641,67 @@
                 return card;
             }
 
+            function renderItems(card, items, feedMeta, fromCache) {
+                const contentEl = card.querySelector('.card-content');
+                const headerLink = card.querySelector('.card-header a');
+                const favicon = card.querySelector('.favicon');
+
+                if (feedMeta) {
+                    headerLink.href = feedMeta.link || '#';
+                    if (feedMeta.domain) {
+                        favicon.src = `https://t0.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://${feedMeta.domain}&size=16`;
+                        favicon.style.display = 'inline-block';
+                        favicon.onerror = () => { favicon.style.display = 'none'; };
+                    }
+                }
+
+                if (!items || items.length === 0) {
+                    contentEl.innerHTML = '<span class="error">No feed items found.</span>';
+                    return;
+                }
+
+                contentEl.innerHTML = '';
+                const cachedAtStr = fromCache && card.dataset.fetchedAt
+                    ? new Date(parseInt(card.dataset.fetchedAt)).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })
+                    : null;
+
+                items.forEach(item => {
+                    const itemEl = document.createElement('div');
+                    itemEl.className = 'feed-item';
+
+                    let displayDate = 'Date unavailable';
+                    try {
+                        const pubDate = new Date(item.pubDate);
+                        if (!isNaN(pubDate)) {
+                            displayDate = pubDate.toLocaleString('en-US', {
+                                month: 'short', day: 'numeric',
+                                hour: 'numeric', minute: '2-digit'
+                            });
+                        }
+                    } catch (e) {}
+
+                    const shareBtn = shareSupported
+                        ? `<button class="share-btn" aria-label="Share article" data-url="${escapeHtml(item.link)}" data-title="${escapeHtml(item.title)}">&#x2197;</button>`
+                        : '';
+
+                    itemEl.innerHTML = `
+                        <a href="${escapeHtml(item.link)}" target="_blank" rel="noopener" class="item-title">${escapeHtml(item.title || 'Untitled')}</a>
+                        <div class="item-meta">
+                            <span class="item-date">${displayDate}</span>
+                            ${shareBtn}
+                        </div>
+                    `;
+                    contentEl.appendChild(itemEl);
+                });
+
+                if (fromCache && cachedAtStr) {
+                    const label = document.createElement('p');
+                    label.className = 'cached-label';
+                    label.textContent = `Cached ${cachedAtStr}`;
+                    contentEl.appendChild(label);
+                }
+            }
+
             async function fetchFeed(source, card) {
                 const rssUrl = encodeURIComponent(source.url);
                 const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${rssUrl}&api_key=${apiKey}&count=5`;
@@ -249,104 +710,72 @@
                 const headerLink = card.querySelector('.card-header a');
                 const favicon = card.querySelector('.favicon');
 
-                let domain = source.url;
-                 try {
+                let domain = null;
+                try {
                     domain = new URL(source.url).hostname;
-                 } catch (e) {
-                      console.warn(`Could not parse domain for ${source.name} from URL: ${source.url}`);
-                       try {
-                            domain = source.url.split('/')[2];
-                       } catch (fallbackError) {
-                            console.error("Manual domain extraction failed too:", fallbackError);
-                            domain = null;
-                       }
-                 }
+                } catch (e) {
+                    try { domain = source.url.split('/')[2]; } catch (_) {}
+                }
 
                 try {
                     const response = await fetch(apiUrl);
-                    if (response.status === 401) {
-                         throw new Error(`Unauthorized - Check API Key.`);
-                    }
-                    if (response.status === 422) {
-                         throw new Error(`Unprocessable Feed URL: ${source.url}. API may not support this format.`);
-                    }
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status} ${response.statusText}`);
-                    }
+                    if (response.status === 401) throw new Error('Unauthorized - Check API Key.');
+                    if (response.status === 422) throw new Error(`Unprocessable Feed URL.`);
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status} ${response.statusText}`);
+
                     const data = await response.json();
 
                     if (data.status !== 'ok') {
-                         if (data.message && data.message.includes("Feed not found")) {
-                             throw new Error(`Feed URL is invalid or unparseable.`);
-                         }
-                          if (data.message && data.message.includes("Invalid API key")) {
-                             throw new Error(`Invalid API Key provided.`);
-                         }
-                         if (response.status === 429) {
-                             throw new Error(`Rate limited by API.`);
-                         }
-                        throw new Error(`API status not 'ok': ${data.message || 'Unknown API error'}`);
+                        if (data.message && data.message.includes('Feed not found')) throw new Error('Feed URL is invalid or unparseable.');
+                        if (data.message && data.message.includes('Invalid API key')) throw new Error('Invalid API Key provided.');
+                        if (response.status === 429) throw new Error('Rate limited by API.');
+                        throw new Error(`API error: ${data.message || 'Unknown'}`);
                     }
 
-                    const siteLink = data.feed.link;
-                    headerLink.href = siteLink;
-
-                    if (domain) {
-                        favicon.src = `https://t0.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://${domain}&size=16`;
-                        favicon.style.display = 'inline-block';
-                        favicon.onerror = () => { favicon.style.display = 'none'; };
-                    } else {
-                         favicon.style.display = 'none';
-                    }
-
-                    contentEl.innerHTML = '';
+                    const feedMeta = { link: data.feed.link, domain };
                     const items = data.items;
 
-                    if (!items || items.length === 0) {
-                        contentEl.innerHTML = '<span class="error">No feed items found.</span>';
-                        return;
-                    }
+                    // Persist to IndexedDB
+                    await idbPut(source.name, items, feedMeta);
+                    card.dataset.fetchedAt = Date.now();
 
-                    items.forEach(item => {
-                        const itemEl = document.createElement('div');
-                        itemEl.className = 'feed-item';
-
-                        let displayDate = 'Date unavailable';
-                        try {
-                           const pubDate = new Date(item.pubDate);
-                           if (!isNaN(pubDate)) {
-                               displayDate = pubDate.toLocaleString('en-US', {
-                                   month: 'short',
-                                   day: 'numeric',
-                                   hour: 'numeric',
-                                   minute: '2-digit'
-                               });
-                           }
-                        } catch (dateError) {
-                            console.warn("Could not parse date:", item.pubDate, dateError);
-                        }
-
-                        itemEl.innerHTML = `
-                            <a href="${item.link}" target="_blank" rel="noopener" class="item-title">${item.title || 'Untitled'}</a>
-                            <span class="item-date">${displayDate}</span>
-                        `;
-                        contentEl.appendChild(itemEl);
-                    });
+                    // Render fresh data (replaces any cached render)
+                    renderItems(card, items, feedMeta, false);
 
                 } catch (error) {
-                    console.error('Error fetching feed:', source.name, `URL: ${source.url}`, error);
-                    contentEl.innerHTML = `<span class="error">Could not load feed. (${error.message})</span>`;
-                    if(domain) {
-                        favicon.src = `https://t0.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://${domain}&size=16`;
-                        favicon.style.display = 'inline-block';
-                        favicon.onerror = () => { favicon.style.display = 'none'; };
-                        headerLink.href = 'http://' + domain;
-                    } else {
-                        favicon.style.display = 'none';
-                        headerLink.href = '#';
+                    console.error('Error fetching feed:', source.name, error);
+
+                    // Only show error if the card doesn't already have cached content rendered
+                    const hasCachedContent = contentEl.querySelector('.feed-item');
+                    if (!hasCachedContent) {
+                        contentEl.innerHTML = `<span class="error">Could not load feed. (${escapeHtml(error.message)})</span>`;
+                        if (domain) {
+                            favicon.src = `https://t0.gstatic.com/faviconV2?client=SOCIAL&type=FAVICON&fallback_opts=TYPE,SIZE,URL&url=http://${domain}&size=16`;
+                            favicon.style.display = 'inline-block';
+                            favicon.onerror = () => { favicon.style.display = 'none'; };
+                            headerLink.href = 'http://' + domain;
+                        }
                     }
                 }
             }
+
+            // ── Event delegation for share buttons ────────────────────────────────
+            grid.addEventListener('click', e => {
+                const btn = e.target.closest('.share-btn');
+                if (!btn) return;
+
+                const url = btn.dataset.url;
+                const title = btn.dataset.title;
+
+                if (navigator.share) {
+                    navigator.share({ title, url }).catch(() => {});
+                } else if (navigator.clipboard) {
+                    navigator.clipboard.writeText(url).then(() => {
+                        btn.classList.add('copied');
+                        setTimeout(() => btn.classList.remove('copied'), 2000);
+                    }).catch(() => {});
+                }
+            });
         });
     </script>
 </body>
